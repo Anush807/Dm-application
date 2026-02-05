@@ -1,49 +1,52 @@
-Social Media Campaign Performance Tracker
+# 📊 Social Media Campaign Performance Tracker
+
 A simple full-stack application to manage social media campaigns, record post engagement metrics, and compute campaign-level analytics.
-Built as a learning-focused backend + frontend project, emphasizing clean data modeling, validation, and analytics logic.
 
- Features
-Create marketing campaigns
+This project is **learning-focused**, designed to demonstrate clean backend architecture, proper data validation, relational modeling, and analytics computation without overengineering.
 
-List all campaigns with post counts
+---
 
-Add posts with engagement metrics
+## 🚀 Features
 
-Compute campaign analytics:
+- Create marketing campaigns
+- View all campaigns with post counts
+- Add posts with engagement metrics
+- Compute campaign analytics:
+  - Total engagement
+  - Engagement rate
+  - Best performing post
+- Clean REST APIs with runtime validation
 
-Total engagement
+---
 
-Engagement rate
+## 🧠 What This Project Demonstrates
 
-Best performing post
+- Relational data modeling using PostgreSQL
+- Prisma ORM for type-safe database access
+- Runtime validation using Zod
+- Separation of raw data and derived analytics
+- In-memory computation of engagement metrics
+- Beginner → intermediate backend architecture
 
-Clean REST APIs with validation
+---
 
- What This Project Demonstrates
-Relational data modeling using PostgreSQL
+## 🛠 Tech Stack
 
-Prisma ORM for type-safe database access
+### Backend
+- Node.js
+- TypeScript
+- Express
+- PostgreSQL
+- Prisma ORM
+- Zod
+- Nodemon
 
-Runtime validation using Zod
+### Frontend (optional / planned)
+- React
+- Fetch / Axios
+- Basic analytics dashboard
 
-Separation of raw data storage and derived analytics
+---
 
-In-memory computation of engagement metrics
+## 📂 Project Structure
 
-Clean, beginner → intermediate backend architecture
-
- Tech Stack
-Backend
-Node.js
-
-TypeScript
-
-Express
-
-PostgreSQL
-
-Prisma ORM
-
-Zod
-
-Nodemon
