@@ -46,7 +46,5 @@ This project is **learning-focused**, designed to demonstrate clean backend arch
 - Fetch / Axios
 - Basic analytics dashboard
 
----
 
-## 📂 Project Structure
 
