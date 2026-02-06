@@ -111,7 +111,6 @@ router.get("/:campaignId/analytics", async (req, res) => {
         ? Number(((totalEngagement / campaign.budget) * 100).toFixed(2))
         : 0;
 
-    // 3. Build response
     const analytics = {
       campaignId: campaign.id,
       campaignName: campaign.name,
@@ -127,6 +126,92 @@ router.get("/:campaignId/analytics", async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Failed to compute analytics" });
   }
+});
+
+router.get("/:campaignId/analytics", async(req, res) => {
+  const  campaignId  = Number(req.params) ;
+
+  if(isNaN(campaignId)){
+    return res.status(400).json({ error: "Invalid campaign ID" });
+  }
+
+  try {
+    const { from, to } = req.query;
+    let dateFilter: Record<string, any> = {};
+
+    if(  from || to){
+      dateFilter.createdAt = {};
+
+    if(from){
+      const fromDate = new Date(from as string);
+      if(isNaN(fromDate.getTime())){
+        return res.status(400).json({ error: "Invalid 'from' date" });
+      }
+      dateFilter.createdAt.gte = fromDate;
+    }
+
+    if(to){
+      const toDate = new Date(to as string);
+      if(isNaN(toDate.getTime())){
+        return res.status(400).json({ error: "Invalid 'to' date" });
+      }
+      dateFilter.createdAt.lte = toDate;
+    }
+  }
+     const campaign = await prisma.campaign.findUnique({
+      where: { id: campaignId },
+    });
+
+      if (!campaign) { 
+      return res.status(404).json({ error: "Campaign not found" });
+      }
+  
+    const posts = await prisma.post.findMany({
+      where: {
+        campaignId: campaignId,
+        ...dateFilter
+      }
+    });
+     let totalEngagement = 0;
+    let bestPost: { postId: number; engagement: number } | null = null;
+      for (const post of posts) {
+      const engagement =
+        post.likes +
+        post.comments +
+        post.shares +
+        post.saves;
+
+      totalEngagement += engagement;
+
+      if (!bestPost || engagement > bestPost.engagement) {
+        bestPost = {
+          postId: post.id,
+          engagement,
+        };
+      }
+    }
+     const engagementRate =
+      campaign.budget > 0
+        ? Number(((totalEngagement / campaign.budget) * 100).toFixed(2))
+        : 0;
+
+      res.json({
+      campaignId: campaign.id,
+      campaignName: campaign.name,
+      budget: campaign.budget,
+      totalEngagement,
+      engagementRate,
+      postCount: posts.length,
+      bestPost,
+      from: from || null,
+      to: to || null,
+    })
+  }
+
+  catch (error) {
+    res.status(500).json({ error: "Failed to fetch campaign analytics" });
+  }
+
 });
 
 
