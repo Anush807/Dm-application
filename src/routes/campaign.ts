@@ -49,7 +49,6 @@ router.get("/all", async (_req, res) => {
     }
 });
 
-
 router.post("/:campaignId/post", async (req, res) => {
     const { campaignId } = req.params;
     try {
@@ -156,7 +155,5 @@ router.get("/:campaignId/analytics", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-
 
 export default router;
