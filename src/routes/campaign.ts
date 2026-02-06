@@ -2,6 +2,7 @@ import "dotenv/config";
 import { prisma } from '../../lib/prisma'
 import express from "express";
 import { createCampaignSchema, createPostSchema } from "../vlaidation/index"
+import { computeCampaignAnalytics } from "../service/analytics";
 
 const router = express.Router();
 
@@ -128,91 +129,34 @@ router.get("/:campaignId/analytics", async (req, res) => {
   }
 });
 
-router.get("/:campaignId/analytics", async(req, res) => {
-  const  campaignId  = Number(req.params) ;
-
-  if(isNaN(campaignId)){
-    return res.status(400).json({ error: "Invalid campaign ID" });
-  }
-
+router.get("/:campaignId/analytics", async (req, res) => {
   try {
+    const campaignId = Number(req.params.campaignId);
+    if (isNaN(campaignId)) {
+      return res.status(400).json({ message: "Invalid campaign id" });
+    }
+
     const { from, to } = req.query;
-    let dateFilter: Record<string, any> = {};
 
-    if(  from || to){
-      dateFilter.createdAt = {};
+    const range = {
+      from: from ? new Date(from as string) : undefined,
+      to: to ? new Date(to as string) : undefined,
+    };
 
-    if(from){
-      const fromDate = new Date(from as string);
-      if(isNaN(fromDate.getTime())){
-        return res.status(400).json({ error: "Invalid 'from' date" });
-      }
-      dateFilter.createdAt.gte = fromDate;
-    }
+    const analytics = await computeCampaignAnalytics(campaignId, range);
 
-    if(to){
-      const toDate = new Date(to as string);
-      if(isNaN(toDate.getTime())){
-        return res.status(400).json({ error: "Invalid 'to' date" });
-      }
-      dateFilter.createdAt.lte = toDate;
-    }
-  }
-     const campaign = await prisma.campaign.findUnique({
-      where: { id: campaignId },
+    res.json({
+      range: {
+        from: from || null,
+        to: to || null,
+      },
+      ...analytics,
     });
-
-      if (!campaign) { 
-      return res.status(404).json({ error: "Campaign not found" });
-      }
-  
-    const posts = await prisma.post.findMany({
-      where: {
-        campaignId: campaignId,
-        ...dateFilter
-      }
-    });
-     let totalEngagement = 0;
-    let bestPost: { postId: number; engagement: number } | null = null;
-      for (const post of posts) {
-      const engagement =
-        post.likes +
-        post.comments +
-        post.shares +
-        post.saves;
-
-      totalEngagement += engagement;
-
-      if (!bestPost || engagement > bestPost.engagement) {
-        bestPost = {
-          postId: post.id,
-          engagement,
-        };
-      }
-    }
-     const engagementRate =
-      campaign.budget > 0
-        ? Number(((totalEngagement / campaign.budget) * 100).toFixed(2))
-        : 0;
-
-      res.json({
-      campaignId: campaign.id,
-      campaignName: campaign.name,
-      budget: campaign.budget,
-      totalEngagement,
-      engagementRate,
-      postCount: posts.length,
-      bestPost,
-      from: from || null,
-      to: to || null,
-    })
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
-
-  catch (error) {
-    res.status(500).json({ error: "Failed to fetch campaign analytics" });
-  }
-
 });
+
 
 
 export default router;
