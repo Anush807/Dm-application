@@ -29,7 +29,8 @@ model Post {
   comments   Int
   shares     Int
   saves      Int
-
+  platform   String   @default("unknown")
+  content    String   @default("")
   campaign Campaign @relation(fields: [campaignId], references: [id])
   campaignId Int
   createdAt  DateTime @default(now())

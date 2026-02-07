@@ -68,8 +68,9 @@ router.post("/:campaignId/post", async (req, res) => {
                 campaignId: parseInt(campaignId)
             }
         })
+        res.status(201).json({ message: "Post created successfully", post });
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch campaign" });
+        res.status(500).json({ error: error instanceof Error ? error.message : "Failed to create post" });
     }
 });
 
