@@ -7,15 +7,21 @@ import {
   computeInsightSignals,
   generateInsights,
 } from "../service/insights";
+import { requireAuth } from "../middleware/requireAuth";
+import {} from "../types/express";
 
 const router = express.Router();
 
-router.post("/create", async (req, res) => {
+router.post("/create", requireAuth,async (req, res) => {
     try {
+        const userId = req.auth?.userId
+        if (!userId) {
+            return res.status(401).json({ error: "User ID is required" });
+        }
         const { name, budget } = createCampaignSchema.parse(req.body);
 
         const campaign = await prisma.campaign.create({
-            data: { name, budget }
+            data: { name, budget, userId }
         })
         res.json({
             message:
@@ -27,9 +33,16 @@ router.post("/create", async (req, res) => {
     }
 })
 
-router.get("/all", async (_req, res) => {
+router.get("/all", requireAuth,async (req, res) => {
     try {
+  
+        const userId = req.auth?.userId
+        if (!userId) {
+            return res.status(401).json({ error: "User ID is required" });
+        }
+
         const campaigns = await prisma.campaign.findMany({
+          where: { userId },
             include: {
                 _count: {
                     select: { posts: true },
@@ -40,7 +53,7 @@ router.get("/all", async (_req, res) => {
             },
         });
 
-        const response = campaigns.map(c => ({
+        const response = campaigns.map((c: { id: any; name: any; budget: any; createdAt: any; _count: { posts: any; }; }) => ({
             id: c.id,
             name: c.name,
             budget: c.budget,
@@ -53,24 +66,39 @@ router.get("/all", async (_req, res) => {
     }
 });
 
-router.post("/:campaignId/post", async (req, res) => {
-    const { campaignId } = req.params;
+router.post("/:campaignId/post", requireAuth, async (req, res) => {
+    const campaignId  = Number(req.params.campaignId);
     try {
+        const userId = req.auth?.userId
+        if (!userId) {
+            return res.status(401).json({ error: "User ID is required" });
+        }
         const data = createPostSchema.parse(req.body);
         if(!campaignId){
             return res.status(400).json({ error: "Campaign ID is required" });
         }
         console.log(data, campaignId)
 
+        const campaign = await prisma.campaign.findFirst({
+            where: {
+              id: campaignId,
+              userId,
+            },
+          });
+        if (!campaign) {
+            return res.status(404).json({ error: "Campaign not found" });
+        }
+
         const post  = await prisma.post.create({
             data:{
                 ...data,
-                campaignId: parseInt(campaignId)
+                campaignId,
+                userId
             }
         })
-        res.status(201).json({ message: "Post created successfully", post });
+        res.status(201).json(post);
     } catch (error) {
-        res.status(500).json({ error: error instanceof Error ? error.message : "Failed to create post" });
+        res.status(500).json({ error: "Failed to fetch campaign" });
     }
 });
 

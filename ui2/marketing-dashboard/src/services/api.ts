@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuth } from '@clerk/clerk-react'; // or your Clerk hook
 import {
   Campaign,
   CampaignAnalytics,
@@ -8,15 +9,38 @@ import {
   InsightResponse,
 } from '../types';
 
-// Update this with your actual API URL
 const API_BASE_URL = 'http://localhost:3001';
 
+// Create axios instance without auth headers (we'll add them per request)
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Helper function to get auth token
+let getTokenFunction: (() => Promise<string | null>) | null = null;
+
+export const setAuthToken = (getToken: () => Promise<string | null>) => {
+  getTokenFunction = getToken;
+};
+
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+  async (config) => {
+    if (getTokenFunction) {
+      const token = await getTokenFunction();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const campaignService = {
   // Create a new campaign
@@ -32,7 +56,6 @@ export const campaignService = {
   },
 
   // Create a post for a campaign
-  // Note: postedAt is optional - backend will use current timestamp if not provided
   createPost: async (campaignId: number, data: CreatePostPayload): Promise<void> => {
     await api.post(`/campaign/${campaignId}/post`, data);
   },
@@ -46,7 +69,6 @@ export const campaignService = {
     const params = new URLSearchParams();
     if (from) params.append('from', from);
     if (to) params.append('to', to);
-    
     const response = await api.get(`/campaign/${campaignId}/analytics?${params.toString()}`);
     return response.data;
   },
@@ -64,7 +86,6 @@ export const campaignService = {
     });
     if (from) params.append('from', from);
     if (to) params.append('to', to);
-    
     const response = await api.get(`/campaign/compare?${params.toString()}`);
     return response.data;
   },
@@ -78,7 +99,6 @@ export const campaignService = {
     const params = new URLSearchParams();
     if (from) params.append('from', from);
     if (to) params.append('to', to);
-    
     const response = await api.get(`/campaign/${campaignId}/insight?${params.toString()}`);
     return response.data;
   },
