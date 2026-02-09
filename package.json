@@ -14,8 +14,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
     "test": "vitest",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "prisma:generate": "prisma generate --config prisma.config.ts",
+    "prisma:migrate": "prisma migrate deploy --config prisma.config.ts"
   },
   "keywords": [],
   "author": "",

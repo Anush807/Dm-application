@@ -27,7 +27,7 @@ function App() {
               <div className="flex items-center space-x-8">
                 <Link to="/" className="flex items-center space-x-2">
                   <BarChart3 className="w-6 h-6 text-blue-600" />
-                  <span className="text-xl font-bold text-gray-900">MarketingHub</span>
+                  <span className="text-xl font-bold text-gray-900">TYM</span>
                 </Link>
                 
                 {/* Only show navigation links when signed in */}
