@@ -6,7 +6,7 @@
     "nodemon": "^3.1.11",
     
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
+    
     "vitest": "^4.0.18"
   },
   "name": "dm-application",
@@ -27,6 +27,8 @@
   "license": "ISC",
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
+    "typescript": "^5.9.3",
+    "prisma": "^7.3.0",
     "@clerk/express": "^1.7.69",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
