@@ -15,6 +15,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "postinstall": "prisma generate",
     "start": "node dist/index.js",
     "test": "vitest",
     "dev": "nodemon",
