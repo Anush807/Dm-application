@@ -9,7 +9,7 @@ import {
   InsightResponse,
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 // Create axios instance without auth headers (we'll add them per request)
 const api = axios.create({
