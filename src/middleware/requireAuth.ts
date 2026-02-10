@@ -1,12 +1,9 @@
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";  
+import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
-/**
- * Ensures:
- * - Request has valid Clerk session
- * - req.auth is populated
- * - Request is blocked if unauthenticated
- */
+const authorizedParties = process.env.CLERK_AUTHORIZED_PARTIES
+  ?.split(",")
+  .map((p) => p.trim());
+
 export const requireAuth = ClerkExpressRequireAuth({
-  // Optional but recommended
-  authorizedParties: ["http://localhost:3000"],
+  authorizedParties,
 });
