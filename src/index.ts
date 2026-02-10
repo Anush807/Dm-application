@@ -7,11 +7,6 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 console.log("Client URL:", CLIENT_URL);
 
-app.use(express.json());
-
-// app.use("/", (_req, res) => {
-//   res.send("API is running");
-// });
 app.use(
   cors({
     origin: CLIENT_URL,
@@ -19,6 +14,13 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(express.json());
+
+// app.use("/", (_req, res) => {
+//   res.send("API is running");
+// });
+
 
 app.use("/campaign", campaignRoutes);
 
