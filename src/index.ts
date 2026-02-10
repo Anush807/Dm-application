@@ -5,6 +5,8 @@ import campaignRoutes from "./routes/campaign";
 const app = express();
 const CLIENT_URL = process.env.CLIENT_URL;
 
+console.log("Client URL:", CLIENT_URL);
+
 app.use(express.json());
 
 // app.use("/", (_req, res) => {
